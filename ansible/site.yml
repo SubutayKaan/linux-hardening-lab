@@ -1,0 +1,9 @@
+---
+# Master Playbook for Linux Hardening Lab
+# Run this file to apply all security configurations at once.
+
+- import_playbook: playbooks/01-sysctl.yml
+- import_playbook: playbooks/02-ssh.yml
+- import_playbook: playbooks/03-auditd.yml
+- import_playbook: playbooks/04-pam.yml
+- import_playbook: playbooks/05-aide.yml

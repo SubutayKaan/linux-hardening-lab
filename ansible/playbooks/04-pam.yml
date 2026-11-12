@@ -1,0 +1,24 @@
+---
+- name: Install and Configure PAM Password Policy
+  hosts: lab
+  become: yes
+
+  tasks:
+    - name: Install libpam-pwquality
+      ansible.builtin.apt:
+        name: libpam-pwquality
+        state: present
+
+    - name: Copy pwquality configuration
+      ansible.builtin.copy:
+        src: ../files/pwquality.conf
+        dest: /etc/security/pwquality.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Configure password aging in login.defs
+      ansible.builtin.lineinfile:
+        path: /etc/login.defs
+        regexp: '^PASS_MAX_DAYS'
+        line: 'PASS_MAX_DAYS   90'

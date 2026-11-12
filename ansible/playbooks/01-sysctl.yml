@@ -1,0 +1,18 @@
+---
+- name: Apply Kernel (sysctl) Hardening
+  hosts: lab
+  become: yes
+
+  tasks:
+    - name: Copy custom sysctl hardening configuration
+      ansible.builtin.copy:
+        src: ../files/99-hardening.conf
+        dest: /etc/sysctl.d/99-hardening.conf
+        owner: root
+        group: root
+        mode: '0644'
+      register: sysctl_config
+
+    - name: Apply sysctl settings
+      ansible.builtin.command: sysctl -p /etc/sysctl.d/99-hardening.conf
+      when: sysctl_config.changed

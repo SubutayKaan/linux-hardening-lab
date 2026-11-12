@@ -1,0 +1,47 @@
+---
+- name: Install and Configure AIDE (File Integrity Monitoring)
+  hosts: lab
+  become: yes
+
+  tasks:
+    - name: Install AIDE and AIDE Common
+      ansible.builtin.apt:
+        name: 
+          - aide
+          - aide-common
+        state: present
+
+    - name: Restore default AIDE configuration if missing
+      ansible.builtin.copy:
+        src: /usr/share/aide/config/aide/aide.conf
+        dest: /etc/aide/aide.conf
+        remote_src: yes
+        owner: root
+        group: root
+        mode: '0600'
+        force: no
+
+    - name: Exclude volatile directories in AIDE configuration
+      ansible.builtin.blockinfile:
+        path: /etc/aide/aide.conf
+        block: |
+          # Exclude temporary and volatile directories from AIDE scans
+          !/var/log
+          !/var/cache
+          !/run
+          !/tmp
+          !/var/lib/apt/lists
+          !/var/lib/dpkg
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - HARDENING"
+
+    - name: Initialize AIDE database
+      ansible.builtin.command: aideinit -f
+      args:
+        creates: /var/lib/aide/aide.db.new
+      async: 900
+      poll: 15
+
+    - name: Move the new AIDE database to active
+      ansible.builtin.command: mv /var/lib/aide/aide.db.new /var/lib/aide/aide.db
+      args:
+        removes: /var/lib/aide/aide.db.new

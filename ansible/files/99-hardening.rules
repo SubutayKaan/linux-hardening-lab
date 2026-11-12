@@ -1,0 +1,22 @@
+# Monitor changes to user and group information files
+-w /etc/passwd -p wa -k identity
+-w /etc/shadow -p wa -k identity
+-w /etc/group -p wa -k identity
+-w /etc/gshadow -p wa -k identity
+
+# Monitor changes to sudoers file
+-w /etc/sudoers -p wa -k sudoers
+-w /etc/sudoers.d/ -p wa -k sudoers
+
+# Monitor execution of commands with elevated privileges
+-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv
+
+# Monitor changes to audit configuration itself
+-w /etc/audit/ -p wa -k auditconfig
+
+# Monitor changes to the SSH configuration
+-w /etc/ssh/sshd_config -p wa -k sshd_config
+-w /etc/ssh/sshd_config.d/ -p wa -k sshd_config
+
+# Monitor changes to systemd unit files
+-w /etc/systemd/system/ -p wa -k systemd

@@ -1,0 +1,37 @@
+---
+- name: Install and Configure Auditd
+  hosts: lab
+  become: yes
+
+  tasks:
+    - name: Install auditd and plugins
+      ansible.builtin.apt:
+        name: 
+          - auditd
+          - audispd-plugins
+        state: present
+
+    - name: Copy auditd hardening rules
+      ansible.builtin.copy:
+        src: ../files/99-hardening.rules
+        dest: /etc/audit/rules.d/99-hardening.rules
+        owner: root
+        group: root
+        mode: '0640'
+      notify: Load auditd rules
+
+    - name: Ensure auditd service is enabled and running
+      ansible.builtin.service:
+        name: auditd
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Load auditd rules
+      ansible.builtin.command: augenrules --load
+      notify: Restart auditd
+
+    - name: Restart auditd
+      ansible.builtin.service:
+        name: auditd
+        state: restarted

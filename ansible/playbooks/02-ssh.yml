@@ -1,0 +1,21 @@
+---
+- name: Apply SSH Hardening
+  hosts: lab
+  become: yes
+
+  tasks:
+    - name: Copy SSH hardening drop-in configuration
+      ansible.builtin.copy:
+        src: ../files/01-ssh-hardening.conf
+        dest: /etc/ssh/sshd_config.d/01-hardening.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart SSH service
+
+  handlers:
+    - name: Restart SSH service
+      ansible.builtin.service:
+        name: ssh
+        state: restarted
+
