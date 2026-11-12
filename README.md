@@ -41,7 +41,8 @@ This project demonstrates a complete security hardening process for an Ubuntu Se
 ## 🚀 How to Run (Ansible)
 To apply the full security baseline to a new Ubuntu server:
 ```bash
-ansible-playbook site.yml -K'''
+ansible-playbook site.yml -K
+```
 
 ## 🧠 Lessons Learned & Challenges Overcome
 
